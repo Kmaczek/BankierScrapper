@@ -5,9 +5,27 @@ using System.Text;
 
 namespace BankierScrapper.Domain
 {
-    public static class RecommandationFactory
+    public class RecommandationFactory : IRecommandationFactory
     {
-        public static RecommendationModel CreateNew(
+        private bool _willValidate = true;
+        public RecommandationFactory()
+        {
+            _willValidate = false;
+        }
+
+        public bool WillValidate
+        {
+            get
+            {
+                return _willValidate;
+            }
+            set
+            {
+                _willValidate = value;
+            }
+        }
+
+        public RecommendationModel CreateNew(
             DateTime releaseDate, 
             string company, 
             string character, 

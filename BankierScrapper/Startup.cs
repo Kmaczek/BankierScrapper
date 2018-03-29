@@ -31,6 +31,7 @@ namespace BankierScrapper
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterType<BankierService>().As<IBankierService>();
+            builder.RegisterType<RecommandationFactory>().As<IRecommandationFactory>();
             builder.RegisterInstance(new ConfigProvider(Configuration));
         }
 

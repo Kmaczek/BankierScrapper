@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BankierScrapper.Domain;
+using BankierScrapper.Domain.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankierScrapper.Controllers
@@ -19,11 +20,11 @@ namespace BankierScrapper.Controllers
 
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<RecommendationModel> Get()
         {
             var sth = bankierService.GetRecomendations();
-
-            return new string[] { "value1", "value2" };
+            var famur = sth.Where(x => x.Company == "FAMUR");
+            return sth;
         }
 
         // GET api/values/5

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using BankierScrapper.Common;
@@ -14,27 +15,68 @@ namespace BankierScrapper.Domain
     {
         private readonly ConfigProvider _config;
         private readonly ILogger<BankierService> _logger;
+        private readonly IRecommandationFactory _recommandationFactory;
         private string defaultFromDate = DateTime.Now.AddYears(-1).ToBankerString();
         private string defaultToDate = DateTime.Now.ToBankerString();
 
-        public BankierService(ConfigProvider configuration, ILogger<BankierService> logger)
+        public BankierService(
+            ConfigProvider configuration, 
+            ILogger<BankierService> logger, 
+            IRecommandationFactory recommandationFactory)
         {
             this._config = configuration;
             this._logger = logger;
+            this._recommandationFactory = recommandationFactory;
+            this._recommandationFactory.WillValidate = true;
         }
 
-        IEnumerable<RecommendationModel> IBankierService.GetRecomendations()
+        public IEnumerable<RecommendationModel> GetRecomendations()
         {
             var recommendations = new List<RecommendationModel>();
-            var source = GetPageSource();
+            var numberOfPages = GetNoOfPages();
+            var sources = GetAllPageSources(numberOfPages);
 
-            if (!string.IsNullOrEmpty(source))
+            if (sources.Count != numberOfPages)
+                _logger.LogWarning($"Number of pages [{numberOfPages}] and fetched sources [{sources.Count}] differ");
+
+            if (sources.Any())
             {
-                ParseSource(source);
-
+                foreach(var source in sources)
+                {
+                    recommendations.AddRange(ParseSource(source));
+                }
             }
 
             return recommendations;
+        }
+
+        private int GetNoOfPages()
+        {
+            var firstPageSource = GetPageSource();
+
+            if (string.IsNullOrEmpty(firstPageSource))
+            {
+                _logger.LogError("Source is empty, cant fetch number of pages.");
+                return 0;
+            }
+
+            try
+            {
+                var doc = new HtmlDocument();
+                doc.LoadHtml(firstPageSource);
+
+                var htmlNavigationItems = doc.DocumentNode.SelectNodes("//a[contains(@class,'numeral btn')]");
+                if (htmlNavigationItems == null)
+                    _logger.LogError("Cant find navigation items.");
+
+                return Convert.ToInt32(htmlNavigationItems[htmlNavigationItems.Count - 1].InnerText);
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e, "Exception during html parsing.");
+            }
+                
+            return 0;
         }
 
         private List<RecommendationModel> ParseSource(string source)
@@ -62,7 +104,7 @@ namespace BankierScrapper.Domain
                         var raport = recommendation.SelectSingleNode(".//td[9]/a")?.GetAttributeValue("href", string.Empty);
 
                         parsedRecommendations.Add(
-                            RecommandationFactory.CreateNew(releasedDate.Value, company, character, currentPrice, targetPrice, 
+                            _recommandationFactory.CreateNew(releasedDate.Value, company, character, currentPrice, targetPrice, 
                                 potential, priceOnRelease, institution, companyLink, raport));
                     }
                 }
@@ -79,11 +121,29 @@ namespace BankierScrapper.Domain
             return parsedRecommendations;
         }
 
-        private string GetPageSource()
+        private List<string> GetAllPageSources(int numberOfPages)
         {
+            var sources = new List<string>();
+
+            for(int i = 1; i < numberOfPages; i++)
+            {
+                sources.Add(GetPageSource(i));
+            }
+
+            return sources;
+        }
+
+        private string GetPageSource(int pageNumber = 1)
+        {
+            if(pageNumber < 1)
+            {
+                _logger.LogError("Page number cannot be lower than 1");
+                return string.Empty;
+            }
+
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(ConstructBankerUrl());
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(ConstructBankerUrl(pageNumber * 100));
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 {
                     if (response.StatusCode == HttpStatusCode.OK)
