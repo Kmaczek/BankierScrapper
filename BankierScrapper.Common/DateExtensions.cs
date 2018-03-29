@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 
 namespace BankierScrapper.Common
 {
@@ -11,6 +10,11 @@ namespace BankierScrapper.Common
         public static string ToBankerString(this DateTime dateTime)
         {
             return dateTime.ToString(bankerDateFormat);
+        }
+
+        public static DateTime ToBankerDate(this string dateString)
+        {
+            return DateTime.ParseExact(dateString, bankerDateFormat, CultureInfo.CurrentCulture);
         }
     }
 }

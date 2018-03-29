@@ -21,5 +21,10 @@ namespace BankierScrapper.Domain.Model
         public decimal ReleasePrice { get; set; }
 
         public string Institution { get; set; }
+
+
+        public string CompanyUrl { get; set; }
+
+        public string RaportUrl { get; set; }
     }
 }

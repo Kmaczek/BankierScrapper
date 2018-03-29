@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using BankierScrapper.Common;
 using BankierScrapper.Domain.Model;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 
 namespace BankierScrapper.Domain
@@ -26,11 +27,56 @@ namespace BankierScrapper.Domain
         {
             var recommendations = new List<RecommendationModel>();
             var source = GetPageSource();
-            var url = ConstructBankerUrl();
-            var rand = new Random(DateTime.Now.Millisecond);
-            recommendations.Add(new RecommendationModel() { CurrentPrice = new Decimal(rand.NextDouble()) });
+
+            if (!string.IsNullOrEmpty(source))
+            {
+                ParseSource(source);
+
+            }
 
             return recommendations;
+        }
+
+        private List<RecommendationModel> ParseSource(string source)
+        {
+            var parsedRecommendations = new List<RecommendationModel>();
+            try
+            {
+                var doc = new HtmlDocument();
+                doc.LoadHtml(source);
+
+                var htmlRecommendations = doc.DocumentNode.SelectNodes("//table[@id='recommendationTable']/tbody/tr[not(contains(@class, 'adv staticRow'))]");
+                if (htmlRecommendations != null)
+                {
+                    foreach(var recommendation in htmlRecommendations)
+                    {
+                        var releasedDate = recommendation.SelectSingleNode(".//td[1]")?.InnerText.ToBankerDate();
+                        var company = recommendation.SelectSingleNode(".//td[2]/a")?.InnerText;
+                        var companyLink = recommendation.SelectSingleNode(".//td[2]/a")?.GetAttributeValue("href", string.Empty);
+                        var character = recommendation.SelectSingleNode(".//td[3]")?.InnerText;
+                        var currentPrice = Convert.ToDecimal(recommendation.SelectSingleNode(".//td[4]")?.InnerText);
+                        var targetPrice = Convert.ToDecimal(recommendation.SelectSingleNode(".//td[5]")?.InnerText);
+                        var potential = Convert.ToDecimal(recommendation.SelectSingleNode(".//td[6]")?.InnerText.Trim().Trim('%'));
+                        var priceOnRelease = Convert.ToDecimal(recommendation.SelectSingleNode(".//td[7]")?.InnerText);
+                        var institution = recommendation.SelectSingleNode(".//td[8]")?.InnerText;
+                        var raport = recommendation.SelectSingleNode(".//td[9]/a")?.GetAttributeValue("href", string.Empty);
+
+                        parsedRecommendations.Add(
+                            RecommandationFactory.CreateNew(releasedDate.Value, company, character, currentPrice, targetPrice, 
+                                potential, priceOnRelease, institution, companyLink, raport));
+                    }
+                }
+                else
+                {
+                    _logger.LogError("Couldnt find recommendations.");
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Cant parse page source");
+            }
+
+            return parsedRecommendations;
         }
 
         private string GetPageSource()
