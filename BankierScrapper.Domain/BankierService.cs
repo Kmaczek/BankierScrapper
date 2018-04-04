@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using BankierScrapper.Common;
-using BankierScrapper.Domain.Model;
+using BankierScrapper.Model;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 
@@ -152,14 +152,10 @@ namespace BankierScrapper.Domain
                         StreamReader readStream = null;
                         string data = string.Empty;
 
-                        if (response.CharacterSet == null)
-                        {
-                            using (readStream = new StreamReader(receiveStream)) { data = readStream.ReadToEnd(); }
-                        }
-                        else
-                        {
-                            using (readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet))) { data = readStream.ReadToEnd(); }
-                        }
+                        // default utf-8 is good
+                        using (readStream = new StreamReader(receiveStream)) { data = readStream.ReadToEnd(); }
+                        // charset sent in response is not correct for html
+                        //    using (readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet))) { data = readStream.ReadToEnd(); }
 
                         return data;
                     }

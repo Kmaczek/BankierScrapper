@@ -1,4 +1,4 @@
-﻿using BankierScrapper.Domain.Model;
+﻿using BankierScrapper.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;

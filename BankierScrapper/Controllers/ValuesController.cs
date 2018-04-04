@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BankierScrapper.Domain;
-using BankierScrapper.Domain.Model;
+using BankierScrapper.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankierScrapper.Controllers

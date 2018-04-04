@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace BankierScrapper.Domain.Model
+namespace BankierScrapper.Model
 {
     public class RecommendationModel
     {

@@ -1,5 +1,5 @@
-﻿using System;
-using BankierScrapper.Domain.Model;
+﻿using BankierScrapper.Model;
+using System;
 
 namespace BankierScrapper.Domain
 {
