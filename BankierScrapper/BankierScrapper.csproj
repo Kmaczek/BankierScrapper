@@ -21,6 +21,8 @@
   <ItemGroup>
     <ProjectReference Include="..\BankierScrapper.Common\BankierScrapper.Common.csproj" />
     <ProjectReference Include="..\BankierScrapper.Domain\BankierScrapper.Domain.csproj" />
+    <ProjectReference Include="..\BankierScrapper.Model\BankierScrapper.Model.csproj" />
+    <ProjectReference Include="..\BankierScrapper.Repositories\BankierScrapper.Repositories.csproj" />
   </ItemGroup>
 
   <ItemGroup>

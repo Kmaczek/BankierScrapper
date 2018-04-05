@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BankierScrapper.Common\BankierScrapper.Common.csproj" />
+    <ProjectReference Include="..\BankierScrapper.Model\BankierScrapper.Model.csproj" />
   </ItemGroup>
 
 </Project>

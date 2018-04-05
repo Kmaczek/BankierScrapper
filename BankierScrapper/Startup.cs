@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.EntityFrameworkCore;
+using BankierScrapper.Repositories;
 
 namespace BankierScrapper
 {
@@ -26,6 +27,8 @@ namespace BankierScrapper
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            var connection = @"Data Source=DK-GE70\SQL2016;Database=Bankier;User ID=sa;Password=ergo.1234;Integrated Security=False;MultipleActiveResultSets=True;";
+            services.AddDbContext<BankierContext>(options => options.UseSqlServer(connection));
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
