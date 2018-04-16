@@ -10,10 +10,12 @@ namespace BankierScrapper.Repositories.Repository.Base
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         protected readonly DbContext Context;
+        protected readonly DbSet<TEntity> Set;
 
         public Repository(DbContext context)
         {
             Context = context;
+            Set = context.Set<TEntity>();
         }
 
         public void Add(TEntity entity)

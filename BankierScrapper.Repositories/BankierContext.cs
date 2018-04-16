@@ -16,6 +16,15 @@ namespace BankierScrapper.Repositories
         public DbSet<CompanyDb> Companies { get; set; }
         public DbSet<TimeSeriesDb> TimeSeries { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RecommendationDb>().HasKey(c => new
+            {
+                c.ReleaseDate,
+                c.Institution,
+                c.CompanyId
+            });
+        }
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
         //    optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["BloggingDatabase"].ConnectionString);

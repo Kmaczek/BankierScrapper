@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using BankierScrapper.Repositories;
+using BankierScrapper.Repositories.Repository.Recommendation;
+using BankierScrapper.Repositories.Repository.Company;
 
 namespace BankierScrapper
 {
@@ -34,7 +36,9 @@ namespace BankierScrapper
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterType<BankierService>().As<IBankierService>();
-            builder.RegisterType<RecommandationFactory>().As<IRecommandationFactory>();
+            builder.RegisterType<RecommendationFactory>().As<IRecommandationFactory>();
+            builder.RegisterType<RecommendationRepository>().As<IRecommendationRepository>();
+            builder.RegisterType<CompanyRepository>().As<ICompanyRepository>();
             builder.RegisterInstance(new ConfigProvider(Configuration));
         }
 

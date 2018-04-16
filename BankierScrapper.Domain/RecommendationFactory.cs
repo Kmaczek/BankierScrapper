@@ -5,10 +5,10 @@ using System.Text;
 
 namespace BankierScrapper.Domain
 {
-    public class RecommandationFactory : IRecommandationFactory
+    public class RecommendationFactory : IRecommandationFactory
     {
         private bool _willValidate = true;
-        public RecommandationFactory()
+        public RecommendationFactory()
         {
             _willValidate = false;
         }

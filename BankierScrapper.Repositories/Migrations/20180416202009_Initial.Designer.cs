@@ -11,8 +11,8 @@ using System;
 namespace BankierScrapper.Repositories.Migrations
 {
     [DbContext(typeof(BankierContext))]
-    [Migration("20180405204942_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20180416202009_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,40 +23,45 @@ namespace BankierScrapper.Repositories.Migrations
 
             modelBuilder.Entity("BankierScrapper.Repositories.DbModels.CompanyDb", b =>
                 {
+                    b.Property<string>("Name")
+                        .ValueGeneratedOnAdd();
+
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Name");
-
                     b.Property<string>("Url");
 
-                    b.HasKey("Id");
+                    b.HasKey("Name");
 
                     b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("BankierScrapper.Repositories.DbModels.RecommendationDb", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<DateTime>("ReleaseDate");
+
+                    b.Property<string>("Institution");
+
+                    b.Property<int>("CompanyId");
 
                     b.Property<decimal>("ChangePotential");
 
                     b.Property<string>("Character");
 
-                    b.Property<int>("CompanyId");
+                    b.Property<string>("CompanyName");
 
-                    b.Property<string>("Institution");
-
-                    b.Property<DateTime>("ReleaseDate");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<decimal>("ReleasePrice");
 
                     b.Property<decimal>("TargetPrice");
 
-                    b.HasKey("Id");
+                    b.HasKey("ReleaseDate", "Institution", "CompanyId");
 
-                    b.HasIndex("CompanyId");
+                    b.HasAlternateKey("CompanyId", "Institution", "ReleaseDate");
+
+                    b.HasIndex("CompanyName");
 
                     b.ToTable("Recommendations");
                 });
@@ -70,11 +75,13 @@ namespace BankierScrapper.Repositories.Migrations
 
                     b.Property<int>("CompanyId");
 
+                    b.Property<string>("CompanyName");
+
                     b.Property<decimal>("Value");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("CompanyName");
 
                     b.ToTable("TimeSeries");
                 });
@@ -83,16 +90,14 @@ namespace BankierScrapper.Repositories.Migrations
                 {
                     b.HasOne("BankierScrapper.Repositories.DbModels.CompanyDb", "Company")
                         .WithMany("Recommendations")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CompanyName");
                 });
 
             modelBuilder.Entity("BankierScrapper.Repositories.DbModels.TimeSeriesDb", b =>
                 {
                     b.HasOne("BankierScrapper.Repositories.DbModels.CompanyDb", "Company")
                         .WithMany("TimeSeries")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CompanyName");
                 });
 #pragma warning restore 612, 618
         }
