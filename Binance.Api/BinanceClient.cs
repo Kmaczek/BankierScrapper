@@ -101,8 +101,8 @@ namespace Binance.Api
 
             var uri = Client.BuildUri(request);
             var query = uri.Query.Trim('?');
-            request.AddOrUpdateParameter("signature", HmacSha256Digest(query, secret), ParameterType.QueryString);
-
+            //request.AddOrUpdateParameter("signature", HmacSha256Digest(query, secret), ParameterType.QueryString);
+            request.AddOrUpdateParameter("signature", HmacShaDigest(query, secret), ParameterType.QueryString);
             IRestResponse response = Client.Execute(request);
 
             if(!response.IsSuccessful)
@@ -116,6 +116,35 @@ namespace Binance.Api
 
             var trade = JsonConvert.DeserializeObject<AccountInformationDto>(response.Content, CamelCaseResolver);
             return trade;
+        }
+
+        public void Test()
+        {
+            //symbol=LTCBTC&side=BUY&type=LIMIT&timeInForce=GTC&quantity=1&price=0.1&recvWindow=5000&timestamp=1499827319559 | openssl dgst -sha256 -hmac "NhqPtmdSJYdKjVHjA7PZj4Mge3R5YNiP1e3UZjInClVN65XAbvqqM6A7H5fATj0j"
+            var query = "symbol=LTCBTC&side=BUY&type=LIMIT&timeInForce=GTC&quantity=1&price=0.1&recvWindow=5000&timestamp=1499827319559";
+            var sec = "NhqPtmdSJYdKjVHjA7PZj4Mge3R5YNiP1e3UZjInClVN65XAbvqqM6A7H5fATj0j";
+            var outp = "c8db56825ae71d6d79447849e617115f4a920fa2acdcab2b053c4b2838bd6b71";
+            var sign1 = HmacShaDigest(query, sec);
+            var sign2 = HmacSha256Digest(query, sec);
+
+            var isOk = string.Equals(sign1, outp);
+            var isOk2 = string.Equals(sign2, outp);
+        }
+
+        public string HmacShaDigest(string message, string secret)
+        {
+            byte[] bSecretKey = Convert.FromBase64String(secret);
+            byte[] bSignature = Encoding.UTF8.GetBytes(message);
+            string strSignature = "";
+            using (HMACSHA256 hmac = new HMACSHA256(bSecretKey))
+            {
+                // Compute signature hash
+                byte[] bSignatureHash = hmac.ComputeHash(bSignature);
+
+                // Convert signature hash to Base64String for transmission
+                strSignature = Convert.ToBase64String(bSignatureHash);
+            }
+            return strSignature;
         }
 
         public static string HmacSha256Digest(string message, string secret)

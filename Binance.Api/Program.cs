@@ -14,7 +14,8 @@ namespace Binance.Api
             var response = client.Ping();
             //var timeResponse = client.ServerTime();
             //var exchange = client.ExchangeInfo();
-            var accountInfo = client.AccountInfo();
+            //var accountInfo = client.AccountInfo();
+            client.Test();
 
             Console.ReadLine();
         }
