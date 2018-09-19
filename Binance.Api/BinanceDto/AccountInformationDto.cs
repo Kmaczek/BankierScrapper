@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,8 +14,17 @@ namespace Binance.Api.BinanceDto
         public bool CanTrade { get; set; }
         public bool CanWithdraw { get; set; }
         public bool CanDeposit { get; set; }
-        public long UpdateTime { get; set; }
-        public IEnumerable<BalanceDto> GetBalance { get; set; }
+        [JsonProperty("updateTimes")]
+        public long UpdateTimestamp { get; set; }
+        [JsonIgnore]
+        public DateTime UpdateTime
+        {
+            get
+            {
+                return DateTimeOffset.FromUnixTimeMilliseconds(UpdateTimestamp).UtcDateTime;
+            }
+        }
+        public IEnumerable<BalanceDto> Balances { get; set; }
   
     }
 }

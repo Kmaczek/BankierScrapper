@@ -70,7 +70,7 @@ namespace Binance.Api {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NhqPtmdSJYdKjVHjA7PZj4Mge3R5YNiP1e3UZjInClVN65XAbvqqM6A7H5fATj0j.
+        ///   Looks up a localized string similar to yQQaMkx8rbV99a7QXnCf6xlC8M95U9aY9y6BBmq4G7DJvyk5NhUWJ5mDail9L6RY.
         /// </summary>
         internal static string secret {
             get {
